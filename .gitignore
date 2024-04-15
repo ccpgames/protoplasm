@@ -1,0 +1,17 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv*/
+.venv*/
+
+# IDEA Stuff
+.idea/
+
+# Local stuff
+/proto/
+/build/
+/tests/res/build/
+-/tests/res/build/empty.txt

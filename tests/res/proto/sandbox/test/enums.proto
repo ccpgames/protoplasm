@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+
+enum ExternalEnum {
+    ZERO_AND_DEFAULT = 0;
+    ONE = 1;
+    TWO = 2;
+    THREE = 3;
+}
+
+enum ExternalAliasEnum {
+    option allow_alias = true;
+    DEFAULT = 0;
+    ZERO = 0;
+    FOUR = 1;
+    FJORIR = 1;
+    FIVE = 2;
+    FIMM = 2;
+    SIX = 3;
+    SEX = 3;
+}
+
+
+message WithExternalEnum {
+    ExternalEnum my_enum = 1;
+    ExternalAliasEnum my_alias_enum = 2;
+
+    repeated ExternalEnum my_enum_list = 3;
+    repeated ExternalAliasEnum my_alias_enum_list = 4;
+
+    map<string, ExternalEnum> my_enum_map = 5;
+    map<string, ExternalAliasEnum> my_alias_enum_map = 6;
+}
+
+
+message WithInternalEnum {
+    enum InternalEnum {
+        ZERO_AND_DEFAULT = 0;
+        FOUR = 4;
+        FIVE = 5;
+        SIX = 6;
+    }
+    enum InternalAliasEnum {
+        option allow_alias = true;
+        DEFAULT = 0;
+        ZERO = 0;
+        SEVEN = 7;
+        SJO = 7;
+        EIGHT = 8;
+        ATTA = 8;
+        NINE = 9;
+        NIU = 9;
+    }
+    InternalEnum my_internal_enum = 1;
+    InternalAliasEnum my_internal_alias_enum = 2;
+
+    repeated InternalEnum my_internal_enum_list = 3;
+    repeated InternalAliasEnum my_internal_alias_enum_list = 4;
+
+    map<string, InternalEnum> my_internal_enum_map = 5;
+    map<string, InternalAliasEnum> my_internal_alias_enum_map = 6;
+}

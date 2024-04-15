@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+
+message OuterMessage {
+
+
+    int32 my_int = 1;
+    string my_string = 2;
+
+    InnerMessage my_message = 3;
+
+    message InnerMessage {
+        int32 my_inner_int = 1;
+        string my_inner_string = 2;
+    }
+}

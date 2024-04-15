@@ -1,0 +1,115 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+import "google/protobuf/timestamp.proto";
+
+
+message SubMessage {
+    string foo = 1;
+    string bar = 2;
+}
+
+
+// Used in testing to see exactly how each field type and combo descriptor looks like.
+message RainbowMessage {
+
+    // type=9  |  has_options=False  |  lable=1  |  message_type=None
+    string simple_field = 1;
+    // type=11  |  has_options=False  |  lable=1  |  message_type=SubMessage.DESCRIPTOR
+    SubMessage message_field = 2;
+
+    // type=9  |  has_options=False  |  lable=3  |  message_type=None
+    repeated string simple_list = 3;
+    // type=11  |  has_options=False  |  lable=3  |  message_type=SubMessage.DESCRIPTOR
+    repeated SubMessage message_list = 4;
+
+    // type=11  |  has_options=False  |  lable=3  |  message_type=SimpleMapEntry.DESCRIPTOR -> has_options=True  |  fields_by_name[value].type=9
+    map<string, string> simple_map = 5;
+    // type=11  |  has_options=False  |  lable=3  |  message_type=MessageMapEntry.DESCRIPTOR -> has_options=True  |  fields_by_name[value].type=11
+    map<string, SubMessage> message_map = 6;
+}
+
+
+message TimestampMessage {
+    google.protobuf.Timestamp my_timestamp = 1;
+    repeated google.protobuf.Timestamp my_timestamp_list = 2;
+    map<string, google.protobuf.Timestamp> my_timestamp_map = 3;
+}
+
+
+message BytesMessage {
+    bytes my_bytes = 1;
+    repeated bytes my_bytes_list = 2;
+    map<string, bytes> my_bytes_map = 3;
+}
+
+
+message AllTypes {
+    string my_string = 1;
+    float my_float = 2;
+    double my_double = 3;
+    int32 my_int32 = 4;
+    int64 my_int64 = 5;
+    uint32 my_uint32 = 6;
+    uint64 my_uint64 = 7;
+    sint32 my_sint32 = 8;
+    sint64 my_sint64 = 9;
+    fixed32 my_fixed32 = 10;
+    fixed64 my_fixed64 = 11;
+    sfixed32 my_sfixed32 = 12;
+    sfixed64 my_sfixed64 = 13;
+    bool my_bool = 14;
+    bytes my_bytes = 15;
+}
+
+
+message AllTypesList {
+    repeated string my_string_list = 1;
+    repeated float my_float_list = 2;
+    repeated double my_double_list = 3;
+    repeated int32 my_int32_list = 4;
+    repeated int64 my_int64_list = 5;
+    repeated uint32 my_uint32_list = 6;
+    repeated uint64 my_uint64_list = 7;
+    repeated sint32 my_sint32_list = 8;
+    repeated sint64 my_sint64_list = 9;
+    repeated fixed32 my_fixed32_list = 10;
+    repeated fixed64 my_fixed64_list = 11;
+    repeated sfixed32 my_sfixed32_list = 12;
+    repeated sfixed64 my_sfixed64_list = 13;
+    repeated bool my_bool_list = 14;
+    repeated bytes my_bytes_list = 15;
+}
+
+
+message AllTypesMap {
+    map<string, string> my_string_map = 1;
+    map<int32, int32> my_int32_map = 4;
+    map<int64, int64> my_int64_map = 5;
+    map<uint32, uint32> my_uint32_map = 6;
+    map<uint64, uint64> my_uint64_map = 7;
+    map<sint32, sint32> my_sint32_map = 8;
+    map<sint64, sint64> my_sint64_map = 9;
+    map<fixed32, fixed32> my_fixed32_map = 10;
+    map<fixed64, fixed64> my_fixed64_map = 11;
+    map<sfixed32, sfixed32> my_sfixed32_map = 12;
+    map<sfixed64, sfixed64> my_sfixed64_map = 13;
+    map<bool, bool> my_bool_map = 14;
+}
+
+
+message AllTypesNestedMap {
+    map<string, SubMessage> my_string_map = 1;
+    map<int32, SubMessage> my_int32_map = 4;
+    map<int64, SubMessage> my_int64_map = 5;
+    map<uint32, SubMessage> my_uint32_map = 6;
+    map<uint64, SubMessage> my_uint64_map = 7;
+    map<sint32, SubMessage> my_sint32_map = 8;
+    map<sint64, SubMessage> my_sint64_map = 9;
+    map<fixed32, SubMessage> my_fixed32_map = 10;
+    map<fixed64, SubMessage> my_fixed64_map = 11;
+    map<sfixed32, SubMessage> my_sfixed32_map = 12;
+    map<sfixed64, SubMessage> my_sfixed64_map = 13;
+    map<bool, SubMessage> my_bool_map = 14;
+}

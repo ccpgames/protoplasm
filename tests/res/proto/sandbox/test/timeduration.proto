@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+import "google/protobuf/duration.proto";
+
+
+message DurationMessage {
+    google.protobuf.Duration my_duration = 1;
+    repeated google.protobuf.Duration my_duration_list = 2;
+    map<string, google.protobuf.Duration> my_duration_map = 3;
+}

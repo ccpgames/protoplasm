@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+import "sandbox/test/alpha.proto";
+
+
+message BetaMessage {
+    string my_string = 1;
+    int32 my_number = 2;
+    sandbox.test.AlphaMessage my_foreign_message = 3;
+}

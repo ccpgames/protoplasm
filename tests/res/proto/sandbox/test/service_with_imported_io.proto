@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+import "sandbox/test/delta.proto";
+import "sandbox/test/beta.proto";
+import "sandbox/test/alpha.proto";
+import "sandbox/test/nested.proto";
+import "sandbox/test/rainbow.proto";
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+
+
+// This is a really Simple Service
+service ServiceWithImportedInputAndOutput {
+    // Say hello
+    rpc Simple(stream sandbox.test.DeltaMessage) returns (sandbox.test.SubMessage);
+    rpc Nested(sandbox.test.RainbowMessage) returns (sandbox.test.BetaMessage);
+    rpc Renest(sandbox.test.OuterMessage) returns (sandbox.test.SubMessage);
+    rpc TimestampIn(sandbox.test.TimestampMessage) returns (sandbox.test.AlphaMessage);
+    rpc TimestampOut(sandbox.test.AlphaMessage) returns (google.protobuf.Timestamp);
+    rpc AnyIn(google.protobuf.Any) returns (sandbox.test.AlphaMessage);
+    rpc AnyOut(sandbox.test.AlphaMessage) returns (google.protobuf.Any);
+}
