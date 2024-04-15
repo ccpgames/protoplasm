@@ -1,1 +1,1 @@
-neobuilder == 5.0.0-beta.1
+neobuilder >=5.0, <6
