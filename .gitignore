@@ -14,4 +14,4 @@ venv*/
 /proto/
 /build/
 /tests/res/build/
--/tests/res/build/empty.txt
+!/tests/res/build/empty.txt
