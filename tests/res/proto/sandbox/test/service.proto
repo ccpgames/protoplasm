@@ -1,0 +1,80 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+// This is a really Simple Service
+service SimpleService {
+    // Say hello
+    rpc Hello(HelloRequest) returns (HelloResponse);
+    rpc NestedHello(NestedHelloRequest) returns (NestedHelloResponse);
+    rpc EmptyHello(EmptyHelloRequest) returns (EmptyHelloResponse);
+}
+
+message HelloRequest {
+    string greeting = 1;
+}
+
+message HelloResponse {
+    string reply = 1;
+}
+
+message GreetingMessage {
+    string greeting = 1;
+    string language = 2;
+}
+
+message NestedHelloRequest {
+    GreetingMessage my_message = 1;
+}
+
+message NestedHelloResponse {
+    GreetingMessage my_reply = 1;
+}
+
+message EmptyHelloRequest {}
+
+message EmptyHelloResponse {}
+
+// Does math stuff
+service Math {
+    // Adds two numbers
+    rpc Add(AddRequest) returns (AddResponse);
+    // Subtracts the later number from the former
+    rpc Subtract(SubtractRequest) returns (SubtractResponse);
+
+    rpc IntegerDivision(IntegerDivisionRequest) returns (IntegerDivisionResponse);
+
+}
+
+message AddRequest {
+    int64 x = 1;
+    int64 y = 2;
+}
+
+message AddResponse {
+    int64 result = 1;
+}
+
+// The request to do some bad-ass subtraction
+message SubtractRequest {
+    // Original number
+    int64 x = 1;
+    // Number to subtract
+    int64 y = 2;
+}
+
+// Results of the subtraction
+message SubtractResponse {
+    // The results of x - y
+    int64 result = 1;
+}
+
+message IntegerDivisionRequest {
+    int64 x = 1;
+    int64 y = 2;
+}
+
+message IntegerDivisionResponse {
+    int64 result = 1;
+    int64 remainder = 2;
+}

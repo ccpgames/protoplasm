@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+
+service ServiceWithBadRequestNames {
+    // Say hello
+    rpc DoSomething(MyAction) returns (MyConsequence);
+
+}
+
+message MyAction {
+    string foo = 1;
+}
+
+message MyConsequence {
+    string bar = 1;
+}

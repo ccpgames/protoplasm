@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+// This is a really Simple Service
+service SimpleOneOfService {
+    // Say hello
+    rpc HelloAgain(HelloAgainRequest) returns (HelloAgainResponse);
+}
+
+message HelloAgainRequest {
+    string greeting = 1;
+}
+
+message HelloAgainResponse {
+    oneof reply {
+        string response = 1;
+        int32 number = 2;
+    };
+}

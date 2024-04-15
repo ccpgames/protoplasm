@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+
+message AlphaMessage {
+    string my_string = 1;
+    int32 my_number = 2;
+}

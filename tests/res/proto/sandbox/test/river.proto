@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+service StreamingService {
+    rpc ReverseMyShit(ReverseMyShitRequest) returns (ReverseMyShitResponse);
+    rpc MarcoPolo(stream MarcoPoloRequest) returns (stream MarcoPoloResponse);
+    rpc TellMeAStory(TellMeAStoryRequest) returns (stream TellMeAStoryResponse);
+    rpc GuessTheNumber(stream GuessTheNumberRequest) returns (GuessTheNumberResponse);
+}
+
+message ReverseMyShitRequest {
+    string shit = 1;
+}
+
+message ReverseMyShitResponse {
+    string tihs = 1;
+}
+
+message TellMeAStoryRequest {
+    string story = 1;
+}
+
+message TellMeAStoryResponse {
+    string line = 1;
+}
+
+message MarcoPoloRequest {
+    string question = 1;
+}
+
+message MarcoPoloResponse {
+    string answer = 1;
+}
+
+message GuessTheNumberRequest {
+    int32 number = 1;
+}
+
+message GuessTheNumberResponse {
+    string did_i_win = 1;
+}

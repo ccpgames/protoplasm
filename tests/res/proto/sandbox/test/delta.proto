@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+import "sandbox/test/beta.proto";
+
+
+message DeltaMessage {
+    string my_string = 1;
+    int32 my_number = 2;
+    sandbox.test.BetaMessage my_level_three_message = 3;
+}

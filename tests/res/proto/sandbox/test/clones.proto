@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+import "google/protobuf/timestamp.proto";
+
+
+message SubThing {
+    string foo = 1;
+    string bar = 2;
+}
+
+
+message ThingOne {
+    string my_string = 1;
+    int32 my_number = 2;
+    float my_float = 3;
+    google.protobuf.Timestamp my_timestamp = 4;
+    SubThing my_subthing = 5;
+    string my_unique_string = 6;
+}
+
+
+message ThingTwo {
+    string my_string = 1;
+    int32 my_number = 2;
+    float my_float = 3;
+    google.protobuf.Timestamp my_timestamp = 4;
+    SubThing my_subthing = 5;
+    string my_special_string = 6;
+}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+// This should skip grpc stub generation
+option py_generic_services = true;
+
+
+// This is a really Simple Service
+service InterfaceOnlyService {
+    // Say hello
+    rpc OnHello(OnHelloRequest) returns (OnHelloResponse);
+}
+
+message OnHelloRequest {
+    string greeting = 1;
+}
+
+message OnHelloResponse {
+    string reply = 1;
+}

@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package unittesting.unary;
+
+service UnaryService {
+    rpc WithNoData(WithNoDataRequest) returns (WithNoDataResponse);
+    rpc WithInput(WithInputRequest) returns (WithInputResponse);
+    rpc WithOutput(WithOutputRequest) returns (WithOutputResponse);
+    rpc WithBoth(WithBothRequest) returns (WithBothResponse);
+    rpc WithManyInputs(WithManyInputsRequest) returns (WithManyInputsResponse);
+    rpc WithManyOutputs(WithManyOutputsRequest) returns (WithManyOutputsResponse);
+    rpc WithManyBoths(WithManyBothsRequest) returns (WithManyBothsResponse);
+}
+
+message WithNoDataRequest {}
+message WithNoDataResponse {}
+
+message WithInputRequest {
+    string unnamed_input = 1;
+}
+message WithInputResponse {}
+
+message WithOutputRequest {}
+message WithOutputResponse {
+    string unnamed_output = 1;
+}
+
+message WithBothRequest {
+    string some_input = 1;
+}
+message WithBothResponse {
+    string some_output = 1;
+}
+
+message WithManyInputsRequest {
+    string first_input = 1;
+    int32 second_input = 2;
+    bool third_input = 3;
+}
+message WithManyInputsResponse {}
+
+message WithManyOutputsRequest {}
+message WithManyOutputsResponse {
+    string first_output = 1;
+    int32 second_output = 2;
+    bool third_output = 3;
+}
+
+message WithManyBothsRequest {
+    string another_first_input = 1;
+    int32 another_second_input = 2;
+    bool another_third_input = 3;
+}
+message WithManyBothsResponse {
+    string another_first_output = 1;
+    int32 another_second_output = 2;
+    bool another_third_output = 3;
+}
