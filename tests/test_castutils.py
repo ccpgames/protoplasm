@@ -8,11 +8,6 @@ import sys
 import shutil
 import time
 
-from sandbox.test import rainbow_pb2
-from sandbox.test import rainbow_dc
-from sandbox.test import enums_pb2
-from sandbox.test import enums_dc
-
 import logging
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
@@ -91,6 +86,8 @@ class CastutilsTest(unittest.TestCase):
                                           message_map__mickey__foo='mouse'))
 
     def test_mkproto(self):
+        from sandbox.test import rainbow_pb2
+
         p1 = rainbow_pb2.SubMessage()
         p1.foo = 'Foo!'
         p1.bar = 'Bar!!!'
@@ -109,6 +106,8 @@ class CastutilsTest(unittest.TestCase):
         self.assertEqual(p4, protoplasm.casting.mkproto(rainbow_pb2.SubMessage))
 
     def test_nested_mkproto(self):
+        from sandbox.test import rainbow_pb2
+
         p1 = rainbow_pb2.RainbowMessage()
         self.assertEqual(p1, protoplasm.casting.mkproto(rainbow_pb2.RainbowMessage))
 
@@ -289,6 +288,8 @@ class CastutilsTest(unittest.TestCase):
                                                          message_map__mickey__foo='mouse'))
 
     def test_mkdataclass(self):
+        from sandbox.test import rainbow_dc
+
         dc1 = rainbow_dc.SubMessage()
         dc1.foo = 'Foo!'
         dc1.bar = 'Bar!!!'
@@ -307,6 +308,8 @@ class CastutilsTest(unittest.TestCase):
         self.assertEqual(dc4, protoplasm.casting.mkdataclass(rainbow_dc.SubMessage))
 
     def test_nested_mkdataclass(self):
+        from sandbox.test import rainbow_dc
+
         dc1 = rainbow_dc.RainbowMessage()
         self.assertEqual(dc1, protoplasm.casting.mkdataclass(rainbow_dc.RainbowMessage))
 
@@ -483,6 +486,9 @@ class CastutilsTest(unittest.TestCase):
                                                              ))
 
     def test_import_dataclass(self):
+        from sandbox.test import rainbow_pb2
+        from sandbox.test import rainbow_dc
+
         self.assertEqual(rainbow_dc.SubMessage, castutils.import_dataclass_by_proto(rainbow_pb2.SubMessage))
         self.assertEqual(rainbow_dc.SubMessage, castutils.import_dataclass_by_proto(rainbow_pb2.SubMessage()))
         self.assertEqual(rainbow_dc.RainbowMessage, castutils.import_dataclass_by_proto(rainbow_pb2.RainbowMessage))
@@ -492,6 +498,8 @@ class CastutilsTest(unittest.TestCase):
         self.assertNotEqual(castutils.import_dataclass_by_proto(rainbow_pb2.SubMessage), castutils.import_dataclass_by_proto(rainbow_pb2.RainbowMessage))
 
     def test_timestamp_mkproto(self):
+        from sandbox.test import rainbow_pb2
+
         ts1 = '2012-07-03T14:50:51.654321Z'
         dt1 = datetime.datetime(2012, 7, 3, 14, 50, 51, 654321)
         self.assertEqual(ts1, dt1.strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
@@ -525,6 +533,8 @@ class CastutilsTest(unittest.TestCase):
                                                                                             my_timestamp_map__midnight=ts5))
 
     def test_timestamp_mkdataclass(self):
+        from sandbox.test import rainbow_dc
+
         ts1 = '2012-07-03T14:50:51.654321Z'
         dt1 = datetime.datetime(2012, 7, 3, 14, 50, 51, 654321)
         self.assertEqual(ts1, dt1.strftime('%Y-%m-%dT%H:%M:%S.%fZ'))
@@ -559,6 +569,8 @@ class CastutilsTest(unittest.TestCase):
                                                                    my_timestamp_map__midnight=dt5))
 
     def test_byte_mkproto(self):
+        from sandbox.test import rainbow_pb2
+
         as_str_1 = 'Þórður Matthíasson'
         as_bytes_1 = as_str_1.encode('utf-8')
         as_base64_1 = base64.encodebytes(as_bytes_1).decode('utf-8').strip()
@@ -593,6 +605,8 @@ class CastutilsTest(unittest.TestCase):
                                                               my_bytes_map__one=as_base64_5))
 
     def test_byte_mkdataclass(self):
+        from sandbox.test import rainbow_dc
+
         as_str_1 = 'Þórður Matthíasson'
         as_bytes_1 = as_str_1.encode('utf-8')
         as_base64_1 = base64.encodebytes(as_bytes_1).decode('utf-8').strip()
@@ -627,6 +641,8 @@ class CastutilsTest(unittest.TestCase):
                                                                    my_bytes_map__one=as_base64_5))
 
     def test_enum_mkproto(self):
+        from sandbox.test import enums_pb2
+
         p_expect = enums_pb2.WithExternalEnum()
         p_expect.my_enum = enums_pb2.TWO
 
@@ -712,6 +728,8 @@ class CastutilsTest(unittest.TestCase):
                                                                my_internal_alias_enum_map__default=0))
 
     def test_enum_mkdataclass(self):
+        from sandbox.test import enums_dc
+
         dc_expect = enums_dc.WithExternalEnum()
         dc_expect.my_enum = enums_dc.TWO
 
