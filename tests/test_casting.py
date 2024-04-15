@@ -18,6 +18,9 @@ BUILD_ROOT = os.path.join(HERE, 'res', 'build')
 
 
 class CastingTest(unittest.TestCase):
+    def setUp(self):
+        self.maxDiff = None
+
     @classmethod
     def setUpClass(cls) -> None:
         # Remove old stuff...
@@ -511,6 +514,12 @@ class CastingTest(unittest.TestCase):
         self.assertEqual(p2_expect, casting.dataclass_to_proto(dc2))
         self.assertEqual(dc2, casting.proto_to_dataclass(p2_expect))
         self.assertEqual(dc2, casting.proto_to_dataclass(casting.dataclass_to_proto(dc2)))
+
+        log.info(f'p2_expect={p2_expect!r}')
+        log.info(f'p2_expect as dataclass={casting.proto_to_dataclass(p2_expect)!r}')
+        log.info(f'p2_expect and back again ={casting.dataclass_to_proto(casting.proto_to_dataclass(p2_expect))!r}')
+        log.info(f'p2_expect and back again as dataclass={casting.proto_to_dataclass(casting.dataclass_to_proto(casting.proto_to_dataclass(p2_expect)))!r}')
+
         self.assertEqual(p2_expect, casting.dataclass_to_proto(casting.proto_to_dataclass(p2_expect)))
 
         i1 = p2_expect.my_any_list.add()
