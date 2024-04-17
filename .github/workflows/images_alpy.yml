@@ -1,0 +1,128 @@
+name: Publish Docker Images (Alpy)
+
+on:
+  workflow_call:
+    inputs:
+      IMAGE_REGISTRY:
+        required: true
+        type: string
+        default: "ccpgames"
+      PSYCOPG_VERSION:
+        required: true
+        type: string
+      GRPCIO_IMAGE_VERSION:
+        required: true
+        type: string
+      PROTOPLASM_PY_PKG_VERSION:
+        required: true
+        type: string
+    secrets:
+      REGISTRY_USER:
+        required: true
+      REGISTRY_TOKEN:
+        required: true
+
+jobs:
+  alpy_base:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ "3.8.18", "3.9.18", "3.10.13", "3.11.8", "3.12.2" ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Set config variable env
+        run: |
+          ALPY_VERSION=`echo ${{ matrix.python-version }} | cut -d. -f1,2`
+          echo "ALPY_VERSION=$ALPY_VERSION" >> $GITHUB_ENV
+          echo "HASH_VERSION=${{ hashFiles('requirements.txt', 'docker/alpy/base.Dockerfile') }}" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/alpy/base.Dockerfile
+          network: host
+          no-cache: true
+          push: true
+          build-args: |
+            PYTHON_VERSION=${{ matrix.python-version }}
+          tags: |
+            ${{ inputs.IMAGE_REGISTRY }}/grpcio-alpy${{ env.ALPY_VERSION }}-base:${{ inputs.GRPCIO_IMAGE_VERSION }}-${{ env.HASH_VERSION }}
+            ${{ inputs.IMAGE_REGISTRY }}/grpcio-alpy${{ env.ALPY_VERSION }}-base:latest
+
+  alpy:
+    runs-on: ubuntu-latest
+    needs: [ alpy_base ]
+    strategy:
+      matrix:
+        alpy-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Set config variable env
+        run: |
+          echo "IMG_FULL=${{ inputs.IMAGE_REGISTRY }}/protoplasm:${{ inputs.PROTOPLASM_PY_PKG_VERSION }}-alpy${{ matrix.alpy-version }}" >> $GITHUB_ENV
+          echo "HASH_VERSION=${{ hashFiles('requirements.txt', 'docker/alpy/base.Dockerfile') }}" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/alpy/Dockerfile
+          network: host
+          no-cache: true
+          push: true
+          build-args: |
+            PACKAGE_VERSION=${{ inputs.PROTOPLASM_PY_PKG_VERSION }}
+            BASE_IMAGE=${{ inputs.IMAGE_REGISTRY }}/grpcio-alpy${{ matrix.alpy-version }}-base:${{ inputs.GRPCIO_IMAGE_VERSION }}-${{ env.HASH_VERSION }}
+          tags: |
+            ${{ env.IMG_FULL }}
+            ${{ inputs.IMAGE_REGISTRY }}/protoplasm:latest-alpy${{ env.ALPY_VERSION }}
+
+  alpy_psycopg:
+    runs-on: ubuntu-latest
+    needs: [ alpy ]
+    strategy:
+      matrix:
+        alpy-version: [ "3.8", "3.9", "3.10", "3.11", "3.12" ]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.REGISTRY_USER }}
+          password: ${{ secrets.REGISTRY_TOKEN }}
+
+      - name: Set config variable env
+        run: |
+          echo "IMG_FULL=${{ inputs.IMAGE_REGISTRY }}/protoplasm:${{ inputs.PROTOPLASM_PY_PKG_VERSION }}-alpy${{ matrix.alpy-version }}-psycopg${{ inputs.PSYCOPG_VERSION }}" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: docker/alpy/psycopg.Dockerfile
+          network: host
+          no-cache: true
+          push: true
+          build-args: |
+            BASE_IMAGE=${{ inputs.IMAGE_REGISTRY }}/protoplasm:${{ inputs.PROTOPLASM_PY_PKG_VERSION }}-alpy${{ matrix.alpy-version }}
+            PSYCOPG_VERSION=${{ inputs.PSYCOPG_VERSION }}
+          tags: |
+            ${{ env.IMG_FULL }}
+            ${{ inputs.IMAGE_REGISTRY }}/protoplasm:latest-alpy${{ matrix.alpy-version }}-psycopg${{ inputs.PROTOPLASM_PY_PKG_VERSION }}
+            ${{ inputs.IMAGE_REGISTRY }}/protoplasm:latest-alpy${{ matrix.alpy-version }}-psycopg

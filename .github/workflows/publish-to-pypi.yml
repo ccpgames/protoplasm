@@ -1,26 +1,32 @@
 name: Publish Python Package
 
 on:
-  release:
-    types: [ created ]
+  workflow_call:
+    secrets:
+      PYPI_API_TOKEN:
+        required: true
 
 jobs:
   build-and-publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
         with:
           python-version: '3.8'
+
       - name: Install Dependencies
         run: |
           python --version
           python -m pip install --upgrade pip
           pip install --upgrade setuptools wheel twine
+
       - name: Build and Package
         run: |
           python setup.py sdist bdist_wheel
+
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@v1.4.2
         with:

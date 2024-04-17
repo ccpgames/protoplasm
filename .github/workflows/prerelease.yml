@@ -1,0 +1,12 @@
+name: Pre Release
+
+on:
+  release:
+    types: [ prereleased ]
+
+jobs:
+  release_to_pypi:
+    name: Publish protoplasm to pypi
+    uses: ./.github/workflows/publish-to-pypi.yml
+    secrets:
+      PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
