@@ -1,0 +1,49 @@
+name: Release
+
+on:
+  release:
+    types: [ released ]
+
+jobs:
+  release_to_pypi:
+    name: Publish protoplasm to pypi
+    uses: ./.github/workflows/publish-to-pypi.yml
+    secrets:
+      PYPI_API_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+
+  retrieve_version:
+    runs-on: ubuntu-latest
+    name: Retrieve protoplasm python package version
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: |
+          PROTOPLASM_PY_PKG_FULL_VERSION=`python3 -c "import protoplasm; print(protoplasm.__version__)"`
+          PROTOPLASM_PY_PKG_SHORT_VERSION=`echo ${PROTOPLASM_PY_PKG_FULL_VERSION} | cut -d. -f1,2`
+          echo "PROTOPLASM_PY_PKG_VERSION=${PROTOPLASM_PY_PKG_SHORT_VERSION}" >> $GITHUB_ENV
+          echo "protoplasm version is ${PROTOPLASM_PY_PKG_FULL_VERSION}"
+    outputs:
+      version: ${{ env.PROTOPLASM_PY_PKG_VERSION }}
+
+  image_alpy:
+    name: Build and push alpy images
+    needs: [ release_to_pypi, retrieve_version ]
+    uses: ./.github/workflows/images_alpy.yml
+    with:
+      PROTOPLASM_PY_PKG_VERSION: ${{ needs.retrieve_version.outputs.version }}
+      GRPCIO_IMAGE_VERSION: "1.62.1"
+      PSYCOPG_VERSION: "3.1"
+    secrets:
+      REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
+      REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
+
+  image_depy:
+    name: Build and push depy images
+    needs: [ release_to_pypi, retrieve_version ]
+    uses: ./.github/workflows/images_depy.yml
+    with:
+      PROTOPLASM_PY_PKG_VERSION: ${{ needs.retrieve_version.outputs.version }}
+      PYODBC_VERSION: "5.1"
+    secrets:
+      REGISTRY_USER: ${{ secrets.REGISTRY_USER }}
+      REGISTRY_TOKEN: ${{ secrets.REGISTRY_TOKEN }}
