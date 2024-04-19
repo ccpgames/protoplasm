@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       IMAGE_REGISTRY:
-        required: true
+        required: false
         type: string
         default: "ccpgames"
       PSYCOPG_VERSION:
