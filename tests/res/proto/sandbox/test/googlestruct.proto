@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+import "google/protobuf/struct.proto";
+
+
+message StructMessage {
+    google.protobuf.Struct my_struct = 1;
+}
