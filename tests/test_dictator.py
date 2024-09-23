@@ -19,11 +19,11 @@ PROTO_ROOT = os.path.join(HERE, 'res', 'proto')
 BUILD_ROOT = os.path.join(HERE, 'res', 'build')
 
 
-
 class ProtoToDictTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         # Remove old stuff...
+
         build_package = os.path.join(BUILD_ROOT, 'sandbox')
         if os.path.exists(build_package):
             shutil.rmtree(build_package)
@@ -214,6 +214,36 @@ class ProtoToDictTest(unittest.TestCase):
                                                     'default': 0}}
 
         self.assertEqual(expected2, dictator.proto_to_dict(p2))
+
+    def test_proto_struct_to_dict(self):
+        from sandbox.test import googlestruct_pb2
+
+        expected_a = {
+            'my_bool': True,
+            'my_float': 4.2,
+            'my_null': None,
+            'my_dict': {'foo': 'bar', 'you': 'tube'},
+            'my_list': [1.0, 3.0, 5.0, 8.0],
+            'my_string': 'I am String, hear me spell!',
+            'my_int': 42.0
+        }
+
+        expected_b = {
+            'my_struct': expected_a
+        }
+
+        proto_struct = googlestruct_pb2.StructMessage()
+        proto_struct.my_struct['my_string'] = 'I am String, hear me spell!'
+        proto_struct.my_struct['my_int'] = 42
+        proto_struct.my_struct['my_float'] = 4.2
+        proto_struct.my_struct['my_null'] = None
+        proto_struct.my_struct['my_bool'] = True
+        proto_struct.my_struct['my_list'] = [1, 3, 5, 8]
+        proto_struct.my_struct['my_dict'] = {'foo': 'bar', 'you': 'tube'}
+
+        self.assertEqual(expected_a, dictator.proto_to_dict(proto_struct.my_struct))
+
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
 
 
 class DataclassToDictTest(unittest.TestCase):
@@ -423,3 +453,31 @@ class DataclassToDictTest(unittest.TestCase):
                                                     'default': 0}}
 
         self.assertEqual(expected2, dictator.dataclass_to_dict(dc2))
+
+    def test_proto_struct_to_dict(self):
+        from sandbox.test.googlestruct_dc import StructMessage
+        expected_a = {
+            'my_bool': True,
+            'my_float': 4.2,
+            'my_null': None,
+            'my_dict': {'foo': 'bar', 'you': 'tube'},
+            'my_list': [1.0, 3.0, 5.0, 8.0],
+            'my_string': 'I am String, hear me spell!',
+            'my_int': 42.0
+        }
+
+        expected_b = {
+            'my_struct': expected_a
+        }
+
+        struct_dc = StructMessage(my_struct={
+            'my_bool': True,
+            'my_float': 4.2,
+            'my_null': None,
+            'my_dict': {'foo': 'bar', 'you': 'tube'},
+            'my_list': [1.0, 3.0, 5.0, 8.0],
+            'my_string': 'I am String, hear me spell!',
+            'my_int': 42.0
+        })
+
+        self.assertEqual(expected_b, dictator.dataclass_to_dict(struct_dc))

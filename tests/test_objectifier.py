@@ -663,3 +663,56 @@ class ObjectifierTest(unittest.TestCase):
                                                      'default': 0}}
 
         self.assertEqual(p_expect2, objectifier.dict_to_dataclass(enums_dc.WithInternalEnum, dict_data2))
+
+    def test_struct_dict_to_proto(self):
+        from sandbox.test import googlestruct_pb2
+
+        the_dict = {
+            'my_struct': {
+                'my_bool': True,
+                'my_float': 4.2,
+                'my_null': None,
+                'my_dict': {'foo': 'bar', 'you': 'tube'},
+                'my_list': [1.0, 3.0, 5.0, 8.0],
+                'my_string': 'I am String, hear me spell!',
+                'my_int': 42.0
+            }
+        }
+
+        expected_pb = googlestruct_pb2.StructMessage()
+        expected_pb.my_struct['my_string'] = 'I am String, hear me spell!'
+        expected_pb.my_struct['my_int'] = 42
+        expected_pb.my_struct['my_float'] = 4.2
+        expected_pb.my_struct['my_null'] = None
+        expected_pb.my_struct['my_bool'] = True
+        expected_pb.my_struct['my_list'] = [1, 3, 5, 8]
+        expected_pb.my_struct['my_dict'] = {'foo': 'bar', 'you': 'tube'}
+
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+    def test_struct_dict_to_dataclass(self):
+        from sandbox.test.googlestruct_dc import StructMessage
+
+        the_dict = {
+            'my_struct': {
+                'my_bool': True,
+                'my_float': 4.2,
+                'my_null': None,
+                'my_dict': {'foo': 'bar', 'you': 'tube'},
+                'my_list': [1.0, 3.0, 5.0, 8.0],
+                'my_string': 'I am String, hear me spell!',
+                'my_int': 42.0
+            }
+        }
+
+        struct_dc = StructMessage(my_struct={
+            'my_bool': True,
+            'my_float': 4.2,
+            'my_null': None,
+            'my_dict': {'foo': 'bar', 'you': 'tube'},
+            'my_list': [1.0, 3.0, 5.0, 8.0],
+            'my_string': 'I am String, hear me spell!',
+            'my_int': 42.0
+        })
+
+        self.assertEqual(struct_dc, objectifier.dict_to_dataclass(StructMessage, the_dict))

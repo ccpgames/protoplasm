@@ -6,6 +6,7 @@ __all__ = [
     'LongDictator',
     'DurationDictator',
     'AnyDictator',
+    'StructDictator',
 ]
 import datetime
 import base64
@@ -309,3 +310,21 @@ class AnyDictator:
         dc_cls = castutils.import_dataclass_by_proto(proto_class)
 
         return dict_to_dataclass(dc_cls, proto_value)
+
+
+class StructDictator:
+    @classmethod
+    def to_dict_value(cls, dc_value: Dict[str, Any],
+                      field: dataclasses.Field, parent: DataclassBase) -> Dict[str, Any]:
+        if dc_value is None:
+            return {}
+
+        return dc_value
+
+    @classmethod
+    def from_dict_value(cls, proto_value: Dict[str, Any],
+                        field: dataclasses.Field, parent_type: Type[DataclassBase]) -> Optional[Dict[str, Any]]:
+        if proto_value is None:
+            return {}
+
+        return proto_value
