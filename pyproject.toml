@@ -36,7 +36,7 @@ classifiers = [
 
 dependencies = [
     "ccptools >= 1.1, <2",
-    "protobuf >=5.28.2, <6",
+    "protobuf == 5.27.2",
     "grpcio >=1.66.1, <2",
     "grpcio-tools >=1.66.1, <2",
     "googleapis-common-protos >=1.65, <2"
