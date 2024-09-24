@@ -305,7 +305,7 @@ class DataclassToDictTest(unittest.TestCase):
                     'simple_map': {'dora': 'Imamap!',
                                    'diego': 'Camera!'},
                     'message_map': {'mickey': {'foo': 'mouse',
-                                               'bar': ''},  # TODO(thordurm@ccpgames.com>) 2024-04-15: Should we include "default/empty" values?!?
+                                               'bar': ''},
                                     'donald': {'foo': 'duck',
                                                'bar': 'trump'}}}
 

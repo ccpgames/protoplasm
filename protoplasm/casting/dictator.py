@@ -36,8 +36,6 @@ def dataclass_to_dict(dc) -> Dict:
     d = {}
     for field in dataclasses.fields(dc):
         dicted = _dataclass_field_to_dict_field(field, dc)
-        # if dicted:
-        # if dicted is not None:  # TODO(thordurm@ccpgames.com>) 2024-04-15: To include "default/empty" fields or not?
         if dicted is not ...:
             d[_get_proto_field_name(field)] = dicted
 
