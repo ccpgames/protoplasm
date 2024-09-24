@@ -47,8 +47,8 @@ def clear_imports():
     importlib.invalidate_caches()
 
 
-def build_new_protos():
-    build_package = os.path.join(BUILD_ROOT, 'sandbox')
+def build_new_protos(package_name: str = 'sandbox'):
+    build_package = os.path.join(BUILD_ROOT, package_name)
     if os.path.exists(build_package):
         shutil.rmtree(build_package)
         time.sleep(0.1)
@@ -62,7 +62,7 @@ def build_new_protos():
     # builder.build()
     log.info(f'{PROJECT_ROOT=}')
 
-    stdout, stderr, retcode = run_command(f'python -m neobuilder.cli.neobuilder -b {BUILD_ROOT} sandbox {PROTO_ROOT}')
+    stdout, stderr, retcode = run_command(f'python -m neobuilder.cli.neobuilder -b {BUILD_ROOT} {package_name} {PROTO_ROOT}')
     log.info(f'{stdout=}')
     log.info(f'{stderr=}')
     log.info(f'{retcode=}')

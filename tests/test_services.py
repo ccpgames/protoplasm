@@ -20,6 +20,7 @@ class ServiceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         build_new_protos()
+        build_new_protos(package_name='unittesting')
         # Add build root to path to access its modules
         sys.path.append(BUILD_ROOT)
 
