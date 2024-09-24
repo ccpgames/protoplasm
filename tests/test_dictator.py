@@ -4,39 +4,24 @@ import base64
 import os
 import sys
 
+import shutil
+import time
+
 from protoplasm import casting
 from protoplasm.casting import dictator
 from protoplasm.casting import castutils
+
+from tests.testutils import *
 
 import logging
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
-import shutil
-import time
-HERE = os.path.dirname(__file__)
-PROTO_ROOT = os.path.join(HERE, 'res', 'proto')
-BUILD_ROOT = os.path.join(HERE, 'res', 'build')
-
 
 class ProtoToDictTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        # Remove old stuff...
-
-        build_package = os.path.join(BUILD_ROOT, 'sandbox')
-        if os.path.exists(build_package):
-            shutil.rmtree(build_package)
-            time.sleep(0.1)
-
-        from neobuilder.neobuilder import NeoBuilder
-
-        # Build stuff...
-        builder = NeoBuilder(package='sandbox',
-                             protopath=PROTO_ROOT,
-                             build_root=BUILD_ROOT)
-        builder.build()
-
+        build_new_protos()
         # Add build root to path to access its modules
         sys.path.append(BUILD_ROOT)
 
@@ -229,7 +214,8 @@ class ProtoToDictTest(unittest.TestCase):
         }
 
         expected_b = {
-            'my_struct': expected_a
+            'my_struct': expected_a,
+            'my_value': 'This is a basic string',
         }
 
         proto_struct = googlestruct_pb2.StructMessage()
@@ -241,28 +227,65 @@ class ProtoToDictTest(unittest.TestCase):
         proto_struct.my_struct['my_list'] = [1, 3, 5, 8]
         proto_struct.my_struct['my_dict'] = {'foo': 'bar', 'you': 'tube'}
 
-        self.assertEqual(expected_a, dictator.proto_to_dict(proto_struct.my_struct))
+        proto_struct.my_value.string_value = 'This is a basic string'
 
+        self.assertEqual(expected_a, dictator.proto_to_dict(proto_struct.my_struct))
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = 7
+        proto_struct.my_value.number_value = 7
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = 43.1234
+        proto_struct.my_value.number_value = 43.1234
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = True
+        proto_struct.my_value.bool_value = True
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = 123456789
+        proto_struct.my_value.number_value = 123456789
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = False
+        proto_struct.my_value.bool_value = False
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = 1.23456789123456789
+        proto_struct.my_value.number_value = 1.23456789123456789
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = None
+        proto_struct.my_value.null_value = 0
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = [1, 2, 3]
+        proto_struct.my_value.list_value.append(1)
+        proto_struct.my_value.list_value.append(2)
+        proto_struct.my_value.list_value.append(3)
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = True
+        proto_struct.my_value.bool_value = True
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = ['a', 7, True]
+        proto_struct.my_value.list_value.append('a')
+        proto_struct.my_value.list_value.append(7)
+        proto_struct.my_value.list_value.append(True)
+        self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
+
+        expected_b['my_value'] = {'a': 7, 'b': True}
+        proto_struct.my_value.struct_value['a'] = 7
+        proto_struct.my_value.struct_value['b'] = True
         self.assertEqual(expected_b, dictator.proto_to_dict(proto_struct))
 
 
 class DataclassToDictTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        # Remove old stuff...
-        build_package = os.path.join(BUILD_ROOT, 'sandbox')
-        if os.path.exists(build_package):
-            shutil.rmtree(build_package)
-            time.sleep(0.1)
-
-        from neobuilder.neobuilder import NeoBuilder
-
-        # Build stuff...
-        builder = NeoBuilder(package='sandbox',
-                             protopath=PROTO_ROOT,
-                             build_root=BUILD_ROOT)
-        builder.build()
-
+        build_new_protos()
         # Add build root to path to access its modules
         sys.path.append(BUILD_ROOT)
 
@@ -282,7 +305,7 @@ class DataclassToDictTest(unittest.TestCase):
                     'simple_map': {'dora': 'Imamap!',
                                    'diego': 'Camera!'},
                     'message_map': {'mickey': {'foo': 'mouse',
-                                               'bar': ''},  # TODO(thordurm@ccpgames.com>) 2024-04-15: Should we include "default/empty" values?!?
+                                               'bar': ''},
                                     'donald': {'foo': 'duck',
                                                'bar': 'trump'}}}
 

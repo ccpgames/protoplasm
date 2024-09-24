@@ -1,5 +1,5 @@
 ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}-alpine3.19
+FROM python:${PYTHON_VERSION}-alpine3.20
 
 COPY requirements.txt .
 

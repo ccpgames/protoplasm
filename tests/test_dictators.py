@@ -9,18 +9,17 @@ from protoplasm.casting import dictators
 from protoplasm import bases
 import collections
 
-import logging
-log = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG)
-
 import os
 import sys
 import sys
 import shutil
 import time
-HERE = os.path.dirname(__file__)
-PROTO_ROOT = os.path.join(HERE, 'res', 'proto')
-BUILD_ROOT = os.path.join(HERE, 'res', 'build')
+
+from tests.testutils import *
+
+import logging
+log = logging.getLogger(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
 
 class FauxEnum(enum.IntEnum):
