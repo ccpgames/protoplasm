@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+package sandbox.test;
+
+
+// This should collide with `typing.Type` when used with `from typing import *`
+message Type {
+    int32 type_id = 1;
+    string name = 2;
+}
+
+
+// This should collide with `typing.Collection` when used with `from typing import *`
+message Collection {
+    string name = 1;
+
+    // Not sure if this causes issues though :D
+    repeated Type types = 2;
+}

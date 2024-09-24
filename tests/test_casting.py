@@ -3,18 +3,16 @@ import datetime
 import unittest
 import os
 import sys
+import shutil
+import time
+
+from tests.testutils import *
 
 from protoplasm import casting
 
 import logging
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
-
-import shutil
-import time
-HERE = os.path.dirname(__file__)
-PROTO_ROOT = os.path.join(HERE, 'res', 'proto')
-BUILD_ROOT = os.path.join(HERE, 'res', 'build')
 
 
 class CastingTest(unittest.TestCase):
@@ -23,20 +21,7 @@ class CastingTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        # Remove old stuff...
-        build_package = os.path.join(BUILD_ROOT, 'sandbox')
-        if os.path.exists(build_package):
-            shutil.rmtree(build_package)
-            time.sleep(0.1)
-
-        from neobuilder.neobuilder import NeoBuilder
-
-        # Build stuff...
-        builder = NeoBuilder(package='sandbox',
-                             protopath=PROTO_ROOT,
-                             build_root=BUILD_ROOT)
-        builder.build()
-
+        build_new_protos()
         # Add build root to path to access its modules
         sys.path.append(BUILD_ROOT)
 
@@ -574,3 +559,117 @@ class CastingTest(unittest.TestCase):
         self.assertEqual(thing_1.my_subthing, thing_2.my_subthing)
 
         self.assertNotEqual(thing_1.my_unique_string, thing_2.my_special_string)
+
+    def test_struct_things_proto_to_dataclass_and_back(self):
+        from sandbox.test.googlestruct_dc import StructMessage
+        from sandbox.test.googlestruct_pb2 import StructMessage as StructMessageProto
+
+        structs_pb = StructMessageProto()
+        structs_pb.my_struct['my_string'] = 'I am String, hear me spell!'
+        structs_pb.my_struct['my_int'] = 42
+        structs_pb.my_struct['my_float'] = 4.2
+        structs_pb.my_struct['my_null'] = None
+        structs_pb.my_struct['my_bool'] = True
+        structs_pb.my_struct['my_list'] = [1, 3, 5, 8]
+        structs_pb.my_struct['my_dict'] = {'foo': 'bar', 'you': 'tube'}
+        structs_pb.my_value.string_value = "Look mom! I'm a string!"
+
+        structs_dc = StructMessage(
+            my_struct={
+                'my_bool': True,
+                'my_float': 4.2,
+                'my_null': None,
+                'my_dict': {'foo': 'bar', 'you': 'tube'},
+                'my_list': [1.0, 3.0, 5.0, 8.0],
+                'my_string': 'I am String, hear me spell!',
+                'my_int': 42.0
+            },
+            my_value="Look mom! I'm a string!"
+        )
+
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = 7
+        structs_pb.my_value.number_value = 7
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = 43.1234
+        structs_pb.my_value.number_value = 43.1234
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = True
+        structs_pb.my_value.bool_value = True
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = 123456789
+        structs_pb.my_value.number_value = 123456789
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = False
+        structs_pb.my_value.bool_value = False
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = 1.23456789123456789
+        structs_pb.my_value.number_value = 1.23456789123456789
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = None
+        structs_pb.my_value.null_value = 0
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc), 'A) dataclass_to_proto failed!')
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb), 'B) proto_to_dataclass failed!')
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)), 'C) proto_to_dataclass(dataclass_to_proto) failed!')
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)), 'D) dataclass_to_proto(proto_to_dataclass) failed!')
+
+        structs_dc.my_value = [1, 2, 3]
+        structs_pb.my_value.list_value.append(1)
+        structs_pb.my_value.list_value.append(2)
+        structs_pb.my_value.list_value.append(3)
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = True
+        structs_pb.my_value.bool_value = True
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = ['a', 7, True]
+        structs_pb.my_value.list_value.append('a')
+        structs_pb.my_value.list_value.append(7)
+        structs_pb.my_value.list_value.append(True)
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))
+
+        structs_dc.my_value = {'a': 7, 'b': True}
+        structs_pb.my_value.struct_value['a'] = 7
+        structs_pb.my_value.struct_value['b'] = True
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(structs_dc))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(structs_pb))
+        self.assertEqual(structs_dc, casting.proto_to_dataclass(casting.dataclass_to_proto(structs_dc)))
+        self.assertEqual(structs_pb, casting.dataclass_to_proto(casting.proto_to_dataclass(structs_pb)))

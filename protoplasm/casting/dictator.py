@@ -37,7 +37,8 @@ def dataclass_to_dict(dc) -> Dict:
     for field in dataclasses.fields(dc):
         dicted = _dataclass_field_to_dict_field(field, dc)
         # if dicted:
-        if dicted is not None:  # TODO(thordurm@ccpgames.com>) 2024-04-15: To include "default/empty" fields or not?
+        # if dicted is not None:  # TODO(thordurm@ccpgames.com>) 2024-04-15: To include "default/empty" fields or not?
+        if dicted is not ...:
             d[_get_proto_field_name(field)] = dicted
 
     return d
@@ -50,10 +51,11 @@ def _get_proto_field_name(field: dataclasses.Field):
 def _dataclass_field_to_dict_field(field: dataclasses.Field, dc):
     val = getattr(dc, field.name)
 
+    dictator_cls = field.metadata.get('dictator', dictators.BaseDictator)
+
     if val is None:
         return None
 
-    dictator_cls = field.metadata.get('dictator', dictators.BaseDictator)
     is_obj = field.metadata.get('is_obj', False)
     is_list = field.metadata.get('is_list', False)
     is_map = field.metadata.get('is_map', False)

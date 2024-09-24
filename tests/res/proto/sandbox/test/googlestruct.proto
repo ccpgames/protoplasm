@@ -7,4 +7,9 @@ import "google/protobuf/struct.proto";
 
 message StructMessage {
     google.protobuf.Struct my_struct = 1;
+    google.protobuf.Value my_value = 2;
+    // google.protobuf.ListValue my_list_value = 3;
+    // google.protobuf.NullValue my_null_value = 4;
 }
+
+

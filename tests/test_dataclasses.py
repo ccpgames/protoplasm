@@ -2,40 +2,20 @@ import unittest
 from protoplasm import casting
 import os
 import sys
-
 import shutil
 import time
-HERE = os.path.dirname(__file__)
-PROTO_ROOT = os.path.join(HERE, 'res', 'proto')
-BUILD_ROOT = os.path.join(HERE, 'res', 'build')
+
+from tests.testutils import *
 
 import logging
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
 
 
-def _get_sub():
-    from sandbox.test import rainbow_dc
-    return rainbow_dc.SubMessage.from_dict({'foo': 'Foo!', 'bar': 'Bar!'})
-
-
 class DataclassTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        # Remove old stuff...
-        build_package = os.path.join(BUILD_ROOT, 'sandbox')
-        if os.path.exists(build_package):
-            shutil.rmtree(build_package)
-            time.sleep(0.1)
-
-        from neobuilder.neobuilder import NeoBuilder
-
-        # Build stuff...
-        builder = NeoBuilder(package='sandbox',
-                             protopath=PROTO_ROOT,
-                             build_root=BUILD_ROOT)
-        builder.build()
-
+        build_new_protos()
         # Add build root to path to access its modules
         sys.path.append(BUILD_ROOT)
 
@@ -125,3 +105,32 @@ class DataclassTest(unittest.TestCase):
         self.assertEqual(dc3, dc4)
         self.assertEqual(dc3, dc5)
         self.assertNotEqual(dc1, dc3)
+
+    def test_load_symbols(self):
+        import sandbox
+        sandbox.load_symbols()
+
+    def test_import_collision(self):
+        from protoplasm import plasm
+        from typing import Type as typing_Type
+        from sandbox.test.importcollision_dc import Type
+        self.assertNotEqual(typing_Type, Type)
+        self.assertTrue(issubclass(Type, plasm.DataclassBase))
+
+        from sandbox.test.importcollision_dc import Collection
+        from typing import Collection as typing_Collection
+        self.assertNotEqual(typing_Collection, Collection)
+        self.assertTrue(issubclass(Collection, plasm.DataclassBase))
+
+    def test_import_collision_via_string(self):
+        from protoplasm import plasm
+        from ccptools.tpu import strimp
+        from typing import Type as typing_Type
+        Type = strimp.get_class('sandbox.test.importcollision_dc.Type')
+        self.assertNotEqual(typing_Type, Type)
+        self.assertTrue(issubclass(Type, plasm.DataclassBase))
+
+        Collection = strimp.get_class('sandbox.test.importcollision_dc.Collection')
+        from typing import Collection as typing_Collection
+        self.assertNotEqual(typing_Collection, Collection)
+        self.assertTrue(issubclass(Collection, plasm.DataclassBase))

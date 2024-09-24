@@ -6,35 +6,20 @@ from protoplasm.casting import objectifier
 import os
 import sys
 
+import shutil
+import time
+
+from tests.testutils import *
+
 import logging
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
-
-import shutil
-import time
-HERE = os.path.dirname(__file__)
-PROTO_ROOT = os.path.join(HERE, 'res', 'proto')
-BUILD_ROOT = os.path.join(HERE, 'res', 'build')
 
 
 class ObjectifierTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        # Remove old stuff...
-        build_package = os.path.join(BUILD_ROOT, 'sandbox')
-        if os.path.exists(build_package):
-            shutil.rmtree(build_package)
-            time.sleep(0.1)
-
-        from neobuilder.neobuilder import NeoBuilder
-
-        # Build stuff...
-        builder = NeoBuilder(package='sandbox',
-                             protopath=PROTO_ROOT,
-                             build_root=BUILD_ROOT)
-        builder.build()
-
-        # Add build root to path to access its modules
+        build_new_protos()
         sys.path.append(BUILD_ROOT)
 
     def test_dict_to_proto(self):
@@ -676,7 +661,8 @@ class ObjectifierTest(unittest.TestCase):
                 'my_list': [1.0, 3.0, 5.0, 8.0],
                 'my_string': 'I am String, hear me spell!',
                 'my_int': 42.0
-            }
+            },
+            'my_value': 'This is a basic string'
         }
 
         expected_pb = googlestruct_pb2.StructMessage()
@@ -687,7 +673,57 @@ class ObjectifierTest(unittest.TestCase):
         expected_pb.my_struct['my_bool'] = True
         expected_pb.my_struct['my_list'] = [1, 3, 5, 8]
         expected_pb.my_struct['my_dict'] = {'foo': 'bar', 'you': 'tube'}
+        expected_pb.my_value.string_value = 'This is a basic string'
 
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = 7
+        expected_pb.my_value.number_value = 7
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = 43.1234
+        expected_pb.my_value.number_value = 43.1234
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = True
+        expected_pb.my_value.bool_value = True
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = 123456789
+        expected_pb.my_value.number_value = 123456789
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = False
+        expected_pb.my_value.bool_value = False
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = 1.23456789123456789
+        expected_pb.my_value.number_value = 1.23456789123456789
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = None
+        expected_pb.my_value.null_value = 0
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = [1, 2, 3]
+        expected_pb.my_value.list_value.append(1)
+        expected_pb.my_value.list_value.append(2)
+        expected_pb.my_value.list_value.append(3)
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = True
+        expected_pb.my_value.bool_value = True
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = ['a', 7, True]
+        expected_pb.my_value.list_value.append('a')
+        expected_pb.my_value.list_value.append(7)
+        expected_pb.my_value.list_value.append(True)
+        self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
+
+        the_dict['my_value'] = {'a': 7, 'b': True}
+        expected_pb.my_value.struct_value['a'] = 7
+        expected_pb.my_value.struct_value['b'] = True
         self.assertEqual(expected_pb, objectifier.dict_to_proto(googlestruct_pb2.StructMessage, the_dict))
 
     def test_struct_dict_to_dataclass(self):

@@ -9,33 +9,17 @@ import grpc
 
 from protoplasm import errors
 
+from tests.testutils import *
+
 import logging
 log = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG)
-
-HERE = os.path.dirname(__file__)
-
-PROTO_ROOT = os.path.join(HERE, 'res', 'proto')
-BUILD_ROOT = os.path.join(HERE, 'res', 'build')
 
 
 class ServiceTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        # Remove old stuff...
-        build_package = os.path.join(BUILD_ROOT, 'unittesting')
-        if os.path.exists(build_package):
-            shutil.rmtree(build_package)
-            time.sleep(0.1)
-
-        from neobuilder.neobuilder import NeoBuilder
-
-        # Build stuff...
-        builder = NeoBuilder(package='unittesting',
-                             protopath=PROTO_ROOT,
-                             build_root=BUILD_ROOT)
-        builder.build()
-
+        build_new_protos()
         # Add build root to path to access its modules
         sys.path.append(BUILD_ROOT)
 

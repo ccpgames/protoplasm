@@ -7,6 +7,9 @@ __all__ = [
     'DurationDictator',
     'AnyDictator',
     'StructDictator',
+    'ValueDictator',
+    'ListValueDictator',
+    'NullValueDictator',
 ]
 import datetime
 import base64
@@ -205,7 +208,7 @@ class EnumDictator(BaseDictator):
         return enum_type(proto_value)
 
 
-class LongDictator:
+class LongDictator(BaseDictator):
     @classmethod
     def to_dict_value(cls, dc_value: Union[str, int], field: dataclasses.Field, parent: DataclassBase) -> str:
         """
@@ -242,7 +245,7 @@ class LongDictator:
         return int(proto_value)
 
 
-class DurationDictator:
+class DurationDictator(BaseDictator):
     @classmethod
     def to_dict_value(cls, dc_value: datetime.timedelta,
                       field: dataclasses.Field, parent: DataclassBase) -> Optional[str]:
@@ -272,7 +275,7 @@ class DurationDictator:
         return datetime.timedelta(seconds=proto_value)
 
 
-class AnyDictator:
+class AnyDictator(BaseDictator):
     @classmethod
     def to_dict_value(cls, dc_value: Optional[DataclassBase],
                       field: dataclasses.Field, parent: DataclassBase) -> Optional[collections.OrderedDict]:
@@ -312,7 +315,7 @@ class AnyDictator:
         return dict_to_dataclass(dc_cls, proto_value)
 
 
-class StructDictator:
+class StructDictator(BaseDictator):
     @classmethod
     def to_dict_value(cls, dc_value: Dict[str, Any],
                       field: dataclasses.Field, parent: DataclassBase) -> Dict[str, Any]:
@@ -328,3 +331,45 @@ class StructDictator:
             return {}
 
         return proto_value
+
+
+class ValueDictator(BaseDictator):
+    @classmethod
+    def to_dict_value(cls, dc_value: Any, field: dataclasses.Field, parent: DataclassBase) -> Any:
+        """Casts data from whatever a dataclass stores to a value that protobuf
+        messages can parse from a dict.
+
+        :param dc_value: Dataclass value
+        :type dc_value: Any
+        :param field: The dataclass field descriptor the value comes from
+        :type field: dataclasses.Field
+        :param parent: The dataclass the field belongs to
+        :type parent: object
+        :return: A value that the protobuf ParseDict function can use
+        :rtype: Any
+        """
+        return dc_value
+
+    @classmethod
+    def from_dict_value(cls, proto_value: Any, field: dataclasses.Field, parent_type: Type[DataclassBase]) -> Any:
+        """Casts data from a dict version of a protobuf message into whatever
+        value the corresponding dataclass uses.
+
+        :param proto_value: Protobuf dict value
+        :type proto_value: Any
+        :param field: The dataclass field descriptor the value is going to
+        :type field: dataclasses.Field
+        :param parent_type: The dataclass the field belongs to
+        :type parent_type: object
+        :return: A value that the dataclass uses
+        :rtype: Any
+        """
+        return proto_value
+
+
+class ListValueDictator(BaseDictator):
+    pass
+
+
+class NullValueDictator(BaseDictator):
+    pass
